@@ -1,73 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WOD Finder</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-    h1 {
-      color: #333;
-    }
-    label, select, button {
-      margin: 10px 5px;
-    }
-    pre {
-      background: #fff;
-      padding: 10px;
-      border: 1px solid #ccc;
-      overflow-x: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js"></script>
 </head>
 <body>
-  <h1>WOD 검색기 (GitHub Pages + Lambda)</h1>
+  <h1>WOD 검색기</h1>
 
   <div>
-    <label for="movement">Movement:</label>
-    <input type="text" id="movement" value="burpee+wall-ball-shot">
+    <!-- 동작 영역 -->
+    <fieldset>
+      <legend>동작</legend>
+      <input type="hidden" id="movement" />
+      <label>
+        <input type="checkbox" id="movementEx" checked />
+        선택한 동작 모두 포함
+      </label>
+      <div class="tag-container" id="movementButtons"></div>
+    </fieldset>
 
-    <label for="equipment">Equipment:</label>
-    <input type="text" id="equipment" value="barbell">
+    <!-- 장비 영역 -->
+    <fieldset>
+      <legend>장비</legend>
+      <input type="hidden" id="equipment" />
+      <div class="tag-container" id="equipmentButtons"></div>
+    </fieldset>
+    <!-- 기타 설정 영역 -->
+    <fieldset>
+      <legend>기타 설정</legend>
+      <label for="sort">정렬</label>
+      <select id="sort">
+        <option value="relevant">관련순</option>
+        <option value="alphabetical">가나다순</option>
+        <option value="recent">최신순</option>
+        <option value="popular">인기순</option>
+      </select>
 
-    <label for="sort">Sort:</label>
-    <select id="sort">
-      <option value="relevant">Relevant</option>
-      <option value="recent">Recent</option>
-      <option value="popular">Popular</option>
-    </select>
+      <label for="paged">페이지</label>
+      <input type="number" id="paged" value="1" min="1" />
+    </fieldset>
 
-    <label for="paged">Page:</label>
-    <input type="number" id="paged" value="1" min="1">
-
-    <button onclick="loadData()">불러오기</button>
+    <!-- 버튼 영역 -->
+    <div style="margin-top: 10px;">
+      <button onclick="loadData()">와드찾기</button>
+      <button onclick="clearAll()">전체 초기화</button>
+    </div>
   </div>
 
-  <pre id="result">결과 없음</pre>
+  <!-- 카드 결과 표시 영역 -->
+  <div id="cards" style="margin-top: 20px; display: grid; gap: 16px;"></div>
+
+  <pre id="result" style="display:none;">결과 없음</pre>
 
   <script>
-    async function loadData() {
-      const movement = document.getElementById('movement').value;
-      const equipment = document.getElementById('equipment').value;
-      const sort = document.getElementById('sort').value;
-      const paged = document.getElementById('paged').value;
 
-      const endpoint = `https://YOUR_API_GATEWAY_URL_HERE?movement=${encodeURIComponent(movement)}&equipment=${encodeURIComponent(equipment)}&sort=${sort}&paged=${paged}`;
+
+    const movementInput = document.getElementById("movement");
+    const equipmentInput = document.getElementById("equipment");
+
+    function toggleSlug(inputEl, slug, btn) {
+      const current = inputEl.value.trim();
+      const slugs = current ? current.split(/\s+/) : [];
+      const index = slugs.indexOf(slug);
+      if (index === -1) {
+        slugs.push(slug);
+        btn.classList.add("active");
+      } else {
+        slugs.splice(index, 1);
+        btn.classList.remove("active");
+      }
+      inputEl.value = slugs.join(" ");
+    }
+
+    function clearAll() {
+      movementInput.value = "";
+      equipmentInput.value = "";
+      document.querySelectorAll(".tag-container button").forEach(btn => btn.classList.remove("active"));
+      document.getElementById("movementEx").checked = false;
+    }
+
+    function renderButtons(data, containerId, inputEl) {
+      const container = document.getElementById(containerId);
+      data.forEach(({ slug, name }) => {
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.onclick = () => toggleSlug(inputEl, slug, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    renderButtons(movements, "movementButtons", movementInput);
+    renderButtons(equipments, "equipmentButtons", equipmentInput);
+
+    async function loadData() {
+      const movement = movementInput.value.trim();
+      const equipment = equipmentInput.value.trim();
+      const sort = document.getElementById("sort").value;
+      const paged = document.getElementById("paged").value;
+      const movementEx = document.getElementById("movementEx").checked ? "unselected" : null;
+
+      const params = new URLSearchParams();
+      if (movement) params.append("movement", movement);
+      if (equipment) params.append("equipment", equipment);
+      if (movementEx) params.append("movement-ex", movementEx);
+      params.append("sort", sort);
+      params.append("paged", paged);
+
+      const endpoint = `https://5bqkixs6qa.execute-api.ap-northeast-2.amazonaws.com/search?${params.toString()}`;
 
       try {
         const res = await fetch(endpoint);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        document.getElementById('result').textContent = JSON.stringify(json, null, 2);
+        const wods = json.wods || [];
+
+        // 필터링: 광고/설명 없는 블록 제거
+        const validWods = wods.filter(w => w.id && w.title && Array.isArray(w.workout));
+
+        renderCards(validWods);
+        document.getElementById("result").style.display = "none";
       } catch (e) {
-        document.getElementById('result').textContent = `❌ Error: ${e.message}`;
+        document.getElementById("cards").innerHTML = "";
+        document.getElementById("result").style.display = "block";
+        document.getElementById("result").textContent = `❌ Error: ${e.message}`;
       }
+    }
+
+    function renderCards(data) {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+      data.forEach(wod => {
+        const card = document.createElement("div");
+        card.style.border = "1px solid #ccc";
+        card.style.borderRadius = "8px";
+        card.style.padding = "12px";
+        card.style.background = "#fff";
+        card.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+
+        const title = document.createElement("h3");
+        title.style.marginTop = "0";
+        const link = document.createElement("a");
+        link.href = wod.url;
+        link.textContent = wod.title;
+        link.target = "_blank";
+        link.style.color = "#007bff";
+        link.style.textDecoration = "none";
+        title.appendChild(link);
+
+        const posted = document.createElement("p");
+        posted.textContent = `${wod.posted_by?.text || ""} • ${wod.posted_date || ""}`;
+        posted.style.fontSize = "0.85em";
+        posted.style.color = "#666";
+
+        const workout = document.createElement("pre");
+        workout.style.background = "#f8f8f8";
+        workout.style.padding = "8px";
+        workout.style.borderRadius = "4px";
+        workout.style.whiteSpace = "pre-wrap";
+        workout.textContent = wod.workout.join("\n").trim();
+
+        card.appendChild(title);
+        card.appendChild(posted);
+        card.appendChild(workout);
+        container.appendChild(card);
+      });
     }
   </script>
 </body>
 </html>
-
