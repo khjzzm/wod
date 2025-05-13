@@ -2,7 +2,7 @@ const movements = [
   {
     "slug": "air-bike",
     "name": "Air Biking/Assault Biking",
-    "krName": "에어 바이킹/어설트 바이크"
+    "krName": "에어 바이크/어설트 바이크"
   },
   {
     "slug": "air-squat",
@@ -525,7 +525,7 @@ const equipments = [
   {
     "slug": "abmat",
     "name": "AbMat",
-    "krName": "앱매트"
+    "krName": "AB매트"
   },
   {
     "slug": "air-bike",
