@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WOD Finder</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    label, select, button {
+      margin: 10px 5px;
+    }
+    pre {
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>WOD 검색기 (GitHub Pages + Lambda)</h1>
+
+  <div>
+    <label for="movement">Movement:</label>
+    <input type="text" id="movement" value="burpee+wall-ball-shot">
+
+    <label for="equipment">Equipment:</label>
+    <input type="text" id="equipment" value="barbell">
+
+    <label for="sort">Sort:</label>
+    <select id="sort">
+      <option value="relevant">Relevant</option>
+      <option value="recent">Recent</option>
+      <option value="popular">Popular</option>
+    </select>
+
+    <label for="paged">Page:</label>
+    <input type="number" id="paged" value="1" min="1">
+
+    <button onclick="loadData()">불러오기</button>
+  </div>
+
+  <pre id="result">결과 없음</pre>
+
+  <script>
+    async function loadData() {
+      const movement = document.getElementById('movement').value;
+      const equipment = document.getElementById('equipment').value;
+      const sort = document.getElementById('sort').value;
+      const paged = document.getElementById('paged').value;
+
+      const endpoint = `https://YOUR_API_GATEWAY_URL_HERE?movement=${encodeURIComponent(movement)}&equipment=${encodeURIComponent(equipment)}&sort=${sort}&paged=${paged}`;
+
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        document.getElementById('result').textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        document.getElementById('result').textContent = `❌ Error: ${e.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
+
