@@ -1,68 +1,127 @@
+/* 기본 스타일 */
 body {
-  font-family: sans-serif;
-  padding: 20px;
-  background: #f5f5f5;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 16px;
+  background-color: #f5f5f5;
+  margin: 0;
 }
+
 h1 {
+  font-size: 1.5rem;
   color: #333;
+  margin-bottom: 16px;
 }
-label, select, button, input {
-  margin: 10px 5px;
+
+/* 공통 요소 여백 */
+label,
+select,
+button,
+input {
+  margin: 6px 0;
+  font-size: 1rem;
 }
-pre {
-  background: #fff;
-  padding: 10px;
-  border: 1px solid #ccc;
-  overflow-x: auto;
-}
-.tag-container {
-  margin: 10px 0;
-}
-.tag-container button {
-  margin: 3px;
-  padding: 6px 12px;
-  font-size: 0.9em;
+
+/* 버튼 */
+button {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
   cursor: pointer;
-  background-color: #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* 태그 버튼 컨테이너 */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.tag-container button {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background-color: #f0f0f0;       /* 밝은 회색 배경 */
+  color: #333;                     /* 진한 글씨색 */
   border: 1px solid #ccc;
   border-radius: 4px;
   transition: all 0.2s;
 }
+
 .tag-container button:hover {
-  background-color: #d5d5d5;
+  background-color: #ddd;
 }
+
 .tag-container button.active {
   background-color: #007bff;
   color: white;
   border-color: #007bff;
 }
-button {
-  padding: 6px 12px;
-  font-size: 0.9em;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-button:hover {
-  background-color: #0056b3;
-}
+
+/* 필드셋 */
 fieldset {
   border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 5px;
+  margin-bottom: 12px;
   border-radius: 6px;
+  background-color: #fff;
 }
+
 legend {
   font-weight: bold;
-  padding: 0 5px;
+  padding: 0 6px;
+  font-size: 1rem;
 }
+
+/* 결과 pre */
+pre {
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  overflow-x: auto;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+/* 카드 레이아웃 */
+#cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  #cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  #cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 로딩 스피너 */
 .spinner {
-  margin: 20px auto;
-  border: 6px solid #f3f3f3; /* 배경 테두리 */
-  border-top: 6px solid #007bff; /* 회전하는 파란 테두리 */
+  margin: 30px auto;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #007bff;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -72,4 +131,33 @@ legend {
 @keyframes spin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* form-row: 반응형 정렬 */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  font-weight: 500;
+}
+
+@media (min-width: 600px) {
+  .form-row {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .form-row label {
+    width: 120px;
+    margin-right: 12px;
+  }
+
+  .form-row select,
+  .form-row input {
+    flex: 1;
+  }
 }
