@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>김짱 와드검색기</title>
+  <title>김 와드검색기</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js"></script>
 </head>
@@ -30,33 +30,40 @@
     <!-- 기타 설정 영역 -->
     <fieldset>
       <legend>기타 설정</legend>
-      <label for="sort">정렬</label>
-      <select id="sort">
-        <option value="relevant">관련순</option>
-        <option value="alphabetical">가나다순</option>
-        <option value="newest">최신순</option>
-        <option value="popular">인기순</option>
-      </select>
 
-      <label for="scoreType">스코어 타입</label>
-      <select id="scoreType">
-        <option value="all">전체</option>
-        <option value="amrap">AMRAP</option>
-        <option value="emom">EMOM</option>
-        <option value="for-load">For Load</option>
-        <option value="for-quality">For Quality</option>
-        <option value="for-time">For Time</option>
-        <option value="tabata">Tabata</option>
-      </select>
+      <div class="form-row">
+        <label for="sort">정렬</label>
+        <select id="sort">
+          <option value="relevant">관련순</option>
+          <option value="alphabetical">가나다순</option>
+          <option value="newest">최신순</option>
+          <option value="popular">인기순</option>
+        </select>
+      </div>
 
-      <label for="category">카테고리</label>
-      <select id="category">
-        <option value="all">전체</option>
-        <option value="benchmark-tribute-wods">Benchmark / Tribute</option>
-        <option value="hero-wods">Hero WODs</option>
-        <option value="other-benchmarks">Other Benchmarks</option>
-        <option value="coach-creations">Coach Creations</option>
-      </select>
+      <div class="form-row">
+        <label for="scoreType">스코어 타입</label>
+        <select id="scoreType">
+          <option value="all">전체</option>
+          <option value="amrap">AMRAP</option>
+          <option value="emom">EMOM</option>
+          <option value="for-load">For Load</option>
+          <option value="for-quality">For Quality</option>
+          <option value="for-time">For Time</option>
+          <option value="tabata">Tabata</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="category">카테고리</label>
+        <select id="category">
+          <option value="all">전체</option>
+          <option value="benchmark-tribute-wods">Benchmark / Tribute</option>
+          <option value="hero-wods">Hero WODs</option>
+          <option value="other-benchmarks">Other Benchmarks</option>
+          <option value="coach-creations">Coach Creations</option>
+        </select>
+      </div>
 
       <input type="hidden" id="paged" value="1" min="1" />
     </fieldset>
