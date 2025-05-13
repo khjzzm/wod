@@ -9,14 +9,20 @@
 </head>
 <body>
   <div>
+    <!-- 표기 전환 버튼 -->
+
+
     <!-- 동작 영역 -->
     <fieldset>
       <legend>동작</legend>
       <input type="hidden" id="movement" />
-      <label>
-        <input type="checkbox" id="movementEx" />
-        선택한 동작만 포함합니다.
-      </label>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label>
+          <input type="checkbox" id="movementEx" />
+          선택한 동작만 포함합니다.
+        </label>
+        <button id="toggleLanguage" class="small-button">한글</button>
+      </div>
       <div class="tag-container" id="movementButtons"></div>
     </fieldset>
 
@@ -26,11 +32,10 @@
       <input type="hidden" id="equipment" />
       <div class="tag-container" id="equipmentButtons"></div>
     </fieldset>
-    
+
     <!-- 기타 설정 영역 -->
     <fieldset>
       <legend>기타 설정</legend>
-
       <div class="form-row">
         <label for="sort">정렬</label>
         <select id="sort">
@@ -87,6 +92,18 @@
     let currentPage = 1;
     let isLoading = false;
     let lastLoadedQuery = "";
+    let showKr = true;
+
+    // 외부에서 가져온 데이터로 가정 (movements, equipments)
+    const movementsCache = movements;
+    const equipmentsCache = equipments;
+
+    document.getElementById("toggleLanguage").addEventListener("click", () => {
+      showKr = !showKr;
+      document.getElementById("toggleLanguage").textContent =
+        `${showKr ? "한글" : "ENG"}`;
+      rerenderButtons();
+    });
 
     function toggleSlug(inputEl, slug, btn) {
       const current = inputEl.value.trim();
@@ -111,19 +128,22 @@
 
     function renderButtons(data, containerId, inputEl) {
       const container = document.getElementById(containerId);
-      data.forEach(({ slug, name }) => {
+      container.innerHTML = "";
+      data.forEach(({ slug, name, krName }) => {
         const btn = document.createElement("button");
-        btn.textContent = name;
+        btn.textContent = showKr ? krName : name;
         btn.onclick = () => toggleSlug(inputEl, slug, btn);
         container.appendChild(btn);
       });
     }
 
-    renderButtons(movements, "movementButtons", movementInput);
-    renderButtons(equipments, "equipmentButtons", equipmentInput);
+    function rerenderButtons() {
+      renderButtons(movementsCache, "movementButtons", movementInput);
+      renderButtons(equipmentsCache, "equipmentButtons", equipmentInput);
+    }
 
     function resetAndLoad() {
-      document.getElementById("cards").innerHTML = ""; // 기존 카드 삭제
+      document.getElementById("cards").innerHTML = "";
       document.getElementById("result").style.display = "none";
       currentPage = 1;
       loadData();
@@ -224,7 +244,8 @@
       }
     });
 
-    // 초기 호출
+    // 초기 렌더링
+    rerenderButtons();
     resetAndLoad();
   </script>
 </body>
